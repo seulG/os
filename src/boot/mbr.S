@@ -25,19 +25,22 @@ SECTION MBR vstart=0x7c00
   mov dx, 0x184f
   int 0x10
 
-  mov byte [gs:0x00], '1'
+  mov byte [gs:0x00], 'i'
   mov byte [gs:0x01], 0xA4
 
-  mov byte [gs:0x02], ' '
+  mov byte [gs:0x02], 'n'
   mov byte [gs:0x03], 0xA4
 
-  mov byte [gs:0x04], 'M'
+  mov byte [gs:0x04], 'i'
   mov byte [gs:0x05], 0xA4
 
-  mov byte [gs:0x06], 'B'
+  mov byte [gs:0x06], 't'
   mov byte [gs:0x07], 0xA4
 
-  mov byte [gs:0x08], 'R'
+  mov byte [gs:0x08], '.'
+  mov byte [gs:0x09], 0xA4
+
+  mov byte [gs:0x08], '.'
   mov byte [gs:0x09], 0xA4
 
   ; 起始扇区LBA地址

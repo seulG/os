@@ -7,6 +7,9 @@ ifeq ("$(wildcard build/master.img)", "")
 endif
 	dd if=$< of=build/master.img bs=512 count=1 conv=notrunc
 
+build/loader.img: build/mbr.img build/loader.bin
+	dd if=build/loader.bin of=build/master.img bs=512 count=1 seek=2 conv=notrunc
+
 %.run: build/%.img
 	bochs -q -unlock
 	rm -rf bx_enh_dbg.ini
@@ -14,4 +17,5 @@ endif
 .PHONY:clean
 clean:
 	rm -rf build/*.bin
-	rm -rf build/master.img
+	rm -rf build/*.img
+	rm -rf build/*.lock
