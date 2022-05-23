@@ -48,7 +48,7 @@ SECTION MBR vstart=0x7c00
   ; 写入内存地址, loader不能超过64KB
   mov bx, LOADER_BASE_ADDR
   ; 待读入扇区数
-  mov cx, 1
+  mov cx, 4
   call rd_disk_m_16
 
   jmp LOADER_BASE_ADDR
