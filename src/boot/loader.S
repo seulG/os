@@ -30,7 +30,8 @@ section loader vstart=LOADER_BASE_ADDR
   
   ; GDT指针，前2字节是GDT界限，后4字节是GDT起始地址
   
-  gdt_ptr dw GDT_LIMIT
+  gdt_ptr:
+    dw GDT_LIMIT
     dd GDT_BASE
 
   loadermsg db '2 loader in real.'
@@ -76,4 +77,5 @@ section loader vstart=LOADER_BASE_ADDR
     mov gs, ax
 
     mov byte [gs:160], 'P'
+    mov byte [gs:162], 'E'
     jmp $
