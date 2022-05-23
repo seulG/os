@@ -1,5 +1,9 @@
 %include "boot.inc"
 SECTION MBR vstart=0x7c00
+  ; 设置为文本模式，清屏
+  mov ax, 3
+  int 0x10
+
   ; 初始化寄存器
   mov ax, cs
   mov ds, ax
@@ -7,41 +11,10 @@ SECTION MBR vstart=0x7c00
   mov es, ax
   mov fs, ax
   mov sp, 0x7c00
-  mov ax, 0xb800
-  mov gs, ax
 
-; 清屏，利用0x06号功能，上卷全部行，则可清屏
-; INT 0x10 功能号0x06 功能描述 上卷窗口
-; 输入：
-; AH 功能号 0x06
-; AL 上卷行数 0 为全部行
-; BH 上卷行属性
-; (CL,CH) 窗口左上角(X,Y)位置
-; (DL,DH) 窗口右下(X,Y)位置
-; 无返回值
-  mov ax, 0x600
-  mov bx, 0x700
-  mov cx, 0
-  mov dx, 0x184f
-  int 0x10
-
-  mov byte [gs:0x00], 'i'
-  mov byte [gs:0x01], 0xA4
-
-  mov byte [gs:0x02], 'n'
-  mov byte [gs:0x03], 0xA4
-
-  mov byte [gs:0x04], 'i'
-  mov byte [gs:0x05], 0xA4
-
-  mov byte [gs:0x06], 't'
-  mov byte [gs:0x07], 0xA4
-
-  mov byte [gs:0x08], '.'
-  mov byte [gs:0x09], 0xA4
-
-  mov byte [gs:0x08], '.'
-  mov byte [gs:0x09], 0xA4
+  ; 打印字符
+  mov si, message
+  call print
 
   ; 起始扇区LBA地址
   mov eax, LOADER_START_SECTOR
@@ -52,6 +25,7 @@ SECTION MBR vstart=0x7c00
   call rd_disk_m_16
 
   jmp LOADER_BASE_ADDR
+
 ; 读取硬盘连续n个扇区
 rd_disk_m_16:
   ; 备份eax和cx 起始扇区和读取个数
@@ -123,6 +97,7 @@ rd_disk_m_16:
   mov cx, ax
 
   mov dx, 0x1f0
+  ; 读数据到内存
   .go_on_read:
     in ax, dx
     mov [bx], ax
@@ -130,6 +105,21 @@ rd_disk_m_16:
     ; 循环计数器为cx
     loop .go_on_read
     ret
+
+print: 
+  mov ah, 0x0e
+.next:
+  mov al, [si]
+  cmp al, 0
+  jz .done
+  int 0x10
+  inc si
+  jmp .next
+.done:
+  ret
+
+  message:
+    db "Into MBR, read loader from disk.", 10, 13, 0
 
   times 510 - ($-$$) db 0
   db 0x55,0xaa

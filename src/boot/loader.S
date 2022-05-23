@@ -2,7 +2,7 @@
 section loader vstart=LOADER_BASE_ADDR
   LOADER_STACK_TOP  equ LOADER_BASE_ADDR
   jmp loader_start
-  
+
   ; 构建GDT及其内部的描述符
   GDT_BASE:
     dd 0x0000_0000
@@ -27,23 +27,18 @@ section loader vstart=LOADER_BASE_ADDR
   SELECTOR_CODE equ (0x0001 << 3) + TI_GDT + RPL0
   SELECTOR_DATA equ (0x0002 << 3) + TI_GDT + RPL0
   SELECTOR_VIDEO equ (0x0003 << 3) + TI_GDT + RPL0
-  
+
   ; GDT指针，前2字节是GDT界限，后4字节是GDT起始地址
-  
   gdt_ptr:
     dw GDT_LIMIT
     dd GDT_BASE
 
-  loadermsg db '2 loader in real.'
-  
+  loadermsg:
+    db 'Prepare to enter protected mode', 0
   loader_start:
     mov sp, LOADER_BASE_ADDR
-    mov bp, loadermsg
-    mov cx, 17
-    mov ax, 0x1301
-    mov bx, 0x001f
-    mov dx, 0x1800
-    int 0x10
+    mov si, loadermsg
+    call print
 
   ; 准备进入保护模式
   ; 1 打开A20
@@ -66,6 +61,19 @@ section loader vstart=LOADER_BASE_ADDR
   ; 刷新流水线
   jmp dword SELECTOR_CODE: p_mode_start
 
+; 实模式打印函数
+print: 
+  mov ah, 0x0e
+.next:
+  mov al, [si]
+  cmp al, 0
+  jz .done
+  int 0x10
+  inc si
+  jmp .next
+.done:
+  ret
+
   [bits 32]
   p_mode_start:
     mov ax, SELECTOR_DATA
@@ -76,6 +84,8 @@ section loader vstart=LOADER_BASE_ADDR
     mov ax, SELECTOR_VIDEO
     mov gs, ax
 
-    mov byte [gs:160], 'P'
-    mov byte [gs:162], 'E'
+    mov byte [gs:320], 'P'
+    mov byte [gs:321], 0x0c
+    mov byte [gs:322], 'E'
+    mov byte [gs:323], 0x0c
     jmp $
