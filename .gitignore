@@ -1,3 +1,5 @@
 /target
 *.lock
 .local_history
+*.bin
+*.img
