@@ -1,30 +1,30 @@
 %include "boot.inc"
 SECTION MBR vstart=0x7c00
-  ; 设置为文本模式，清屏
-  mov ax, 3
-  int 0x10
+; 设置为文本模式，清屏
+mov ax, 3
+int 0x10
 
-  ; 初始化寄存器
-  mov ax, cs
-  mov ds, ax
-  mov es, ax
-  mov es, ax
-  mov fs, ax
-  mov sp, 0x7c00
+; 初始化寄存器
+mov ax, cs
+mov ds, ax
+mov es, ax
+mov es, ax
+mov fs, ax
+mov sp, 0x7c00
 
-  ; 打印字符
-  mov si, message
-  call print
+; 打印字符
+mov si, message
+call print
 
-  ; 起始扇区LBA地址
-  mov eax, LOADER_START_SECTOR
-  ; 写入内存地址, loader不能超过64KB
-  mov bx, LOADER_BASE_ADDR
-  ; 待读入扇区数
-  mov cx, 4
-  call rd_disk_m_16
+; 起始扇区LBA地址
+mov eax, LOADER_START_SECTOR
+; 写入内存地址, loader不能超过64KB
+mov bx, LOADER_BASE_ADDR
+; 待读入扇区数
+mov cx, 4
+call rd_disk_m_16
 
-  jmp LOADER_BASE_ADDR + 0x300
+jmp LOADER_BASE_ADDR + 0x300
 
 ; 读取硬盘连续n个扇区
 rd_disk_m_16:
@@ -118,8 +118,8 @@ print:
 .done:
   ret
 
-  message:
-    db "Into MBR, read loader from disk.", 10, 13, 0
+message:
+  db "Into MBR, read loader from disk.", 10, 13, 0
 
-  times 510 - ($-$$) db 0
-  db 0x55,0xaa
+times 510 - ($-$$) db 0
+db 0x55,0xaa
